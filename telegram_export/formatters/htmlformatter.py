@@ -42,6 +42,8 @@ class HtmlFormatter(BaseFormatter):
         else:
             text = message.text
             body = normal_body_template.format(text=text)
+        if message.reply_message_id:
+            body = reply_template.format(message_id=message.reply_message_id) + body
         if message.forward_id:
             forward = self.get_forward(message.forward_id)
             body = forwaded_wrapper_template.format(

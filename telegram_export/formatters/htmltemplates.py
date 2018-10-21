@@ -112,7 +112,8 @@ footer = """
 """
 
 basic_message_template = """
-<div class="message default clearfix" id="message-{message_id}" >
+<div class="message default clearfix" id="message{message_id}" >
+<a name="message{message_id}"></a>
     <div class="body">
         <div class="pull_right date details" title="{full_date}">
             {time}
@@ -140,5 +141,10 @@ forwaded_wrapper_template = """
         {forward_from} <span class='details'>{date}</span>
     </div>
     {body}
+</div>
+"""
+reply_template = """
+<div class="reply_to details">
+    In reply to <a href="#message{message_id}">this message</a>
 </div>
 """
