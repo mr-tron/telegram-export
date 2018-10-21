@@ -46,6 +46,9 @@ Media = namedtuple('Media', (
     'id', 'name', 'mime_type', 'size', 'thumbnail_id', 'type', 'local_id',
     'volume_id', 'secret', 'extra'
 ))
+Forward = namedtuple('Forward', (
+    'id', 'original_date', 'from_id', 'channel_post', 'post_author'
+))
 
 
 class BaseFormatter:
@@ -186,7 +189,7 @@ class BaseFormatter:
             file = sys.stdout
         elif isinstance(file, (str, Path)):
             if os.path.isdir(file):
-                file = os.path.join(file, str(target))
+                file = os.path.join(file, str(target)+ "." + self.name())
             file = open(file, 'w')
         elif not isinstance(file, TextIOWrapper):  # Is there a better way?
             raise TypeError(
@@ -426,6 +429,31 @@ class BaseFormatter:
         if not row:
             return None
         return Media(*row)
+
+    def get_forward(self, forward_id):
+        cur = self.dbconn.cursor()
+        cur.execute("SELECT ID, OriginalDate, FromID, ChannelPost, PostAuthor FROM Forward "
+                    "WHERE ID = ?;", (forward_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        row = row[:1] + (datetime.datetime.fromtimestamp(row[1]),) + row[2:]
+        return Forward(*row)
+
+    def get_human_readable_forwarded(self, forward):
+        if not forward:
+            return "Unknow forward"
+        if forward.from_id:
+            ent = self.get_user(forward.from_id)
+            if not ent:
+                return "Unknown user: %s" % forward.from_id
+        elif forward.channel_post:
+            ent = self.get_channel(forward.channel_post)
+            if not ent:
+                return "Unknown channel: %s" % forward.channel_post
+        else:
+            return "Unknown forward type"
+        return self.get_display_name(ent)
 
 # if __name__ == '__main__':
     # main()
