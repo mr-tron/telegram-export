@@ -4,7 +4,7 @@ Very much unfinished and needs a web designer to work on it.
 """
 from . import BaseFormatter
 
-import utils as export_utils
+from .. import utils as export_utils
 from .htmltemplates import *
 
 
